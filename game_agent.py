@@ -248,7 +248,7 @@ class CustomPlayer:
         # if all else
         return (self.score(game, self), (-1, -1))
 
-    def alphabeta(self, game, depth, alpha=float("-inf"), beta=float("inf"), maximizing_player=True):
+    def alphabeta(self, game, depth, alpha=-infinity, beta=infinity, maximizing_player=True):
         """Implement minimax search with alpha-beta pruning as described in the
         lectures.
 
