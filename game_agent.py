@@ -38,15 +38,59 @@ def custom_score(game, player):
         The heuristic value of the current game state to the specified player.
     """
 
+
+    return empty_spaces_heuristic(game, player)
+
+def number_moves_heuristic(game, player):
+
+        if game.is_loser(player):
+            return -infinity
+
+        if game.is_winner(player):
+            return infinity
+
+        # players moves
+        moves = len(game.get_legal_moves(player))
+        # oponents moves
+        opponent_moves = len(game.get_legal_moves(game.get_opponent(player)))
+
+        return float(moves - opponent_moves)
+
+def minimize_opponent(game, player):
+
+        if game.is_loser(player):
+            return -infinity
+
+        if game.is_winner(player):
+            return infinity
+
+        # players moves
+        moves = len(game.get_legal_moves(player))
+        # oponents moves
+        opponent_moves = len(game.get_legal_moves(game.get_opponent(player)))
+
+        return float(-opponent_moves)
+
+
+def empty_spaces_heuristic(game, player):
+    # x scales the weight of opponent moves
+    x = 2
+    board_width = 7
+    board_height = 7
+
+    if game.is_loser(player):
+        return -infinity
+
+    if game.is_winner(player):
+        return infinity
+
     # players moves
     moves = len(game.get_legal_moves(player))
     # oponents moves
     opponent_moves = len(game.get_legal_moves(game.get_opponent(player)))
 
-    # super simple heuristic
-    # TODO: optimize, heuristic for different states in the game
-    # return float(moves - opponent_moves)
-    return float((moves - 2 * opponent_moves) * (49 - (moves + opponent_moves)))
+    empty_spaces = len(game.get_blank_spaces())
+    return float((moves - (x * opponent_moves)) * (empty_spaces))
 
 class CustomPlayer:
     """Game-playing agent that chooses a move using your evaluation function
@@ -207,6 +251,10 @@ class CustomPlayer:
 
         # available moves to player
         legal_moves = game.get_legal_moves()
+
+        # worst case
+        if not len(legal_moves):
+            return (self.score(game, self), (-1, -1))
 
         # grab first location as starting move
         current_move = legal_moves[0]
