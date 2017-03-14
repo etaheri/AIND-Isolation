@@ -325,10 +325,6 @@ class CustomPlayer:
             # set lower bound
             current_score = -infinity
 
-        # worst case
-        if not len(legal_moves):
-            return (self.score(game, self), (-1, -1))
-
         # begin the traversal if depth is > 0
         if depth:
             for legal_move in legal_moves:
@@ -336,9 +332,9 @@ class CustomPlayer:
 
                 # recursively call as the oposite player (toggle between min/max)
                 if maximizing_player:
-                    score, _ = self.minimax(new_game, depth-1, False)
+                    score, _ = self.minimax(new_game, depth - 1, False)
                 else:
-                    score, _ = self.minimax(new_game, depth-1, True)
+                    score, _ = self.minimax(new_game, depth - 1, True)
 
                 # if maximizing player finds a score greater than the current score
                 # set current_score to the new found sccore and update the current_move to
@@ -424,9 +420,9 @@ class CustomPlayer:
                 # recursively call alphabeta on oposite players, passing the current
                 # alpha and beta values
                 if maximizing_player:
-                    score, _ = self.alphabeta(new_game, depth-1, alpha, beta, False)
+                    score, _ = self.alphabeta(new_game, depth - 1, alpha, beta, False)
                 else:
-                    score, _ = self.alphabeta(new_game, depth-1, alpha, beta, True)
+                    score, _ = self.alphabeta(new_game, depth - 1, alpha, beta, True)
 
                 if maximizing_player and score > current_score:
                     # same as minimax, but update alpha for max player
