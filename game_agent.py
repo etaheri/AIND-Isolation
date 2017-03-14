@@ -62,7 +62,7 @@ def number_moves_heuristic(game, player):
         # if the resulting list is of length 0, there is an intersection
         # at this point the player with the most moves will win
         # until this point, i will use moves - opponent_moves
-        intersected_lists = moves.intersection(opponent_moves)
+        intersected_lists = [val for val in moves if val in opponent_moves]
 
         if not len(intersected_lists):
             return float(moves_count)
