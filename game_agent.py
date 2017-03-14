@@ -38,52 +38,9 @@ def custom_score(game, player):
         The heuristic value of the current game state to the specified player.
     """
 
+    return filled_spaces_heuristic(game, player)
 
-    return number_moves_heuristic(game, player)
-
-def number_moves_heuristic(game, player):
-
-        x = 3
-
-        if game.is_loser(player):
-            return -infinity
-
-        if game.is_winner(player):
-            return infinity
-
-        # players moves
-        moves = game.get_legal_moves(player)
-        moves_count = len(moves)
-        # oponents moves
-        opponent_moves = game.get_legal_moves(game.get_opponent(player))
-        opponent_moves_count = len(opponent_moves)
-
-        # intersect the legal moves of my player and opponent
-        # if the resulting list is of length 0, there is an intersection
-        # at this point the player with the most moves will win
-        # until this point, i will use moves - opponent_moves
-        intersected_lists = [val for val in moves if val in opponent_moves]
-
-        if not len(intersected_lists):
-            return float(moves_count)
-        else:
-            return float(moves_count - x * opponent_moves_count)
-
-def minimize_opponent_heuristic(game, player):
-
-        if game.is_loser(player):
-            return -infinity
-
-        if game.is_winner(player):
-            return infinity
-
-        # oponents moves
-        opponent_moves = len(game.get_legal_moves(game.get_opponent(player)))
-
-        # garantee the least amount of opponent
-        return float(-opponent_moves)
-
-
+# difference of moves multiplied by the amount of spaces that remain
 def filled_spaces_heuristic(game, player):
     # x scales the weight of opponent moves
     x = 3
@@ -97,13 +54,102 @@ def filled_spaces_heuristic(game, player):
         return infinity
 
     # players moves
-    moves = len(game.get_legal_moves(player))
+    moves = game.get_legal_moves(player)
+    moves_count = len(moves)
     # oponents moves
-    opponent_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    opponent_moves = game.get_legal_moves(game.get_opponent(player))
+    opponent_moves_count = len(opponent_moves)
+
 
     board_tiles = board_width * board_height
     filled_spaces = board_tiles - len(game.get_blank_spaces())
-    return float((moves - (x * opponent_moves)) * (filled_spaces))
+
+    return float((moves_count - (x * opponent_moves_count)) * (filled_spaces))
+
+# award player for being near the center and most moves
+def center_heuristic(game, player):
+    if game.is_loser(player):
+        return -infinity
+
+    if game.is_winner(player):
+        return infinity
+
+    board_center = (4,4)
+
+    # players moves
+    moves = game.get_legal_moves(player)
+    moves_count = len(moves)
+
+    player_location = game.get_player_location(player)
+
+    distance_from_center = abs(player_location[0] - board_center[0]) + abs(player_location[1] - board_center[1])
+
+    return float(moves_count - distance_from_center)
+
+# award player for being away from the center and most moves
+def outside_heuristic(game, player):
+    if game.is_loser(player):
+        return -infinity
+
+    if game.is_winner(player):
+        return infinity
+
+    board_center = (4,4)
+
+    # players moves
+    moves = game.get_legal_moves(player)
+    moves_count = len(moves)
+
+    player_location = game.get_player_location(player)
+
+    distance_from_center = abs(player_location[0] - board_center[0]) + abs(player_location[1] - board_center[1])
+
+    return float(moves_count + distance_from_center)
+
+# award for reducing oponent moves
+def minimize_opponent_heuristic(game, player):
+
+    if game.is_loser(player):
+        return -infinity
+
+    if game.is_winner(player):
+        return infinity
+
+    # oponents moves
+    opponent_moves = len(game.get_legal_moves(game.get_opponent(player)))
+
+    # garantee the least amount of opponent
+    return float(-opponent_moves)
+
+
+# this will only work with trational isolation :(
+def number_moves_heuristic_partition(game, player):
+
+    if game.is_loser(player):
+        return -infinity
+
+    if game.is_winner(player):
+        return infinity
+
+    x = 3
+    # players moves
+    moves = game.get_legal_moves(player)
+    moves_count = len(moves)
+    # oponents moves
+    opponent_moves = game.get_legal_moves(game.get_opponent(player))
+    opponent_moves_count = len(opponent_moves)
+
+    # intersect the legal moves of my player and opponent
+    # if the resulting list is of length 0, there is an intersection
+    # at this point the player with the most moves will win
+    # until this point, i will use moves - opponent_moves
+    intersected_lists = [val for val in moves if val in opponent_moves]
+
+    if not len(intersected_lists):
+        return float(moves_count)
+    else:
+        return float(moves_count - x * opponent_moves_count)
+
 
 class CustomPlayer:
     """Game-playing agent that chooses a move using your evaluation function
